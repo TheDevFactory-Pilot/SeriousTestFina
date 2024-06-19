@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+
+  mongocandidate:
+    image: 'mongo'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  #pull image from ECR and simply runs api calls imperatively 
+  candidateapp:
+  #IF Testing setup, uncomment this
+    build:
+      context: .
+    ports:
+      - 80:80
+    depends_on: 
+      - mongocandidate
+    environment:
+      - DB_EVAL_URL=mongocandidate
+
+  evaluationworker:
+    image: 426691418260.dkr.ecr.us-east-1.amazonaws.com/deployment_testing
+    depends_on: 
+      #- candidateapp
+      - candidateapp
+    volumes:
+      - ./src:/app/src
+    environment: #changes
+      - projectID=66733f35c48db96f4d492906
+      - templateId=65ed04e7fbcd491e89a5433d
+      - skill=nodejs
+      - hiringCampaignId=6669b107925d5834afe20981
+      - sub=aecc5afd-5058-4657-859a-35622e828cf9
+      - trackID=66733f35c48db96f4d492907
+  
+
+
+
